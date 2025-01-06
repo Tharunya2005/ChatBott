@@ -26,6 +26,17 @@ try:
 except LookupError:
     nltk.download('wordnet', download_dir=nltk_data_path)
 
+# Download additional NLTK data files for better functionality
+try:
+    nltk.data.find('corpora/omw-1.4')
+except LookupError:
+    nltk.download('omw-1.4', download_dir=nltk_data_path)
+
+try:
+    nltk.data.find('corpora/stopwords')
+except LookupError:
+    nltk.download('stopwords', download_dir=nltk_data_path)
+
 # Load intents from the JSON file (Make sure the Intent.json is in the same directory or adjust path)
 file_path = os.path.abspath("Intent.json")    
 with open(file_path, "r") as file:
