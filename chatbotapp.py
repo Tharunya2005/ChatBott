@@ -15,7 +15,7 @@ nltk.download('punkt')
 nltk.download('wordnet')  # Download WordNet for Lemmatizer
 
 # Load intents from the JSON file (Make sure the Intent.json is in the same directory or adjust path)
-file_path = os.path.abspath("./Intent.json")    
+file_path = os.path.abspath("Intent.json")    
 with open(file_path, "r") as file:
     intents = json.load(file)
 
