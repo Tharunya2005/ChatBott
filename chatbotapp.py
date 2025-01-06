@@ -15,8 +15,14 @@ ssl._create_default_https_context = ssl._create_unverified_context
 nltk_data_dir = os.path.abspath("nltk_data")
 if not os.path.exists(nltk_data_dir):
     os.makedirs(nltk_data_dir)
+
 nltk.data.path.append(nltk_data_dir)
-nltk.download("punkt", download_dir=nltk_data_dir)
+
+# Add download logic for punkt if not already downloaded
+try:
+    nltk.data.find("tokenizers/punkt")
+except LookupError:
+    nltk.download("punkt", download_dir=nltk_data_dir)
 
 # Load intents from the JSON file
 file_path = os.path.abspath("./Intent.json")
