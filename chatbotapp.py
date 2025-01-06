@@ -18,7 +18,7 @@ if not os.path.exists(nltk_data_dir):
 
 nltk.data.path.append(nltk_data_dir)
 
-# Add download logic for punkt if not already downloaded
+# Download punkt explicitly if it's not already available
 try:
     nltk.data.find("tokenizers/punkt")
 except LookupError:
