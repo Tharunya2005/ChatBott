@@ -10,9 +10,21 @@ from nltk.stem import WordNetLemmatizer
 
 # SSL fix for nltk
 ssl._create_default_https_context = ssl._create_unverified_context
-nltk.data.path.append(os.path.abspath("nltk_data"))
-nltk.download('punkt')
-nltk.download('wordnet')  # Download WordNet for Lemmatizer
+
+# Set NLTK data path explicitly to avoid lookup errors
+nltk_data_path = os.path.abspath("nltk_data")
+nltk.data.path.append(nltk_data_path)
+
+# Ensure necessary NLTK data files are available
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    nltk.download('punkt', download_dir=nltk_data_path)
+
+try:
+    nltk.data.find('corpora/wordnet')
+except LookupError:
+    nltk.download('wordnet', download_dir=nltk_data_path)
 
 # Load intents from the JSON file (Make sure the Intent.json is in the same directory or adjust path)
 file_path = os.path.abspath("Intent.json")    
