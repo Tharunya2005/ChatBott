@@ -10,11 +10,16 @@ from nltk.stem import WordNetLemmatizer
 
 # SSL fix for nltk
 ssl._create_default_https_context = ssl._create_unverified_context
-nltk.data.path.append(os.path.abspath("nltk_data"))
-nltk.download('punkt')
+
+# Ensure NLTK 'punkt' data is available
+nltk_data_dir = os.path.abspath("nltk_data")
+if not os.path.exists(nltk_data_dir):
+    os.makedirs(nltk_data_dir)
+nltk.data.path.append(nltk_data_dir)
+nltk.download("punkt", download_dir=nltk_data_dir)
 
 # Load intents from the JSON file
-file_path = os.path.abspath("./Intent.json")    
+file_path = os.path.abspath("./Intent.json")
 with open(file_path, "r") as file:
     intents = json.load(file)
 
@@ -168,7 +173,7 @@ def main():
             for row in history:
                 st.markdown(f"""
                 <div class="history-item history-item-user">User: {row[0]}</div>
-                <div class="history-item history-item-chatbot">Chatbot: {row[1]}</div>
+                <div class="history-item-chatbot">Chatbot: {row[1]}</div>
                 """, unsafe_allow_html=True)
 
         # User input
