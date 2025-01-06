@@ -11,11 +11,17 @@ from nltk.stem import WordNetLemmatizer
 # SSL fix for nltk
 ssl._create_default_https_context = ssl._create_unverified_context
 nltk.data.path.append(os.path.abspath("nltk_data"))
-nltk.download('punkt')
+
+# Ensure punkt tokenizer is downloaded
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    nltk.download('punkt')
+
 nltk.download('wordnet')  # Download WordNet for Lemmatizer
 
 # Load intents from the JSON file (Make sure the Intent.json is in the same directory or adjust path)
-file_path = os.path.abspath("Intent.json")    
+file_path = os.path.abspath("./Intent.json")    
 with open(file_path, "r") as file:
     intents = json.load(file)
 
@@ -47,7 +53,6 @@ def chatbot(input_text):
 
     return "I'm still learning, please rephrase your question."
 
-counter = 0
 
 # Adding custom HTML and CSS for the sustainable food practices theme
 def add_custom_css():
