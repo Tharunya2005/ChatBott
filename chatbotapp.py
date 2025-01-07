@@ -13,38 +13,57 @@ ssl._create_default_https_context = ssl._create_unverified_context
 
 # Set NLTK data path explicitly to avoid lookup errors
 nltk_data_path = os.path.abspath("nltk_data")
+os.makedirs(nltk_data_path, exist_ok=True)  # Ensure the directory exists
 nltk.data.path.append(nltk_data_path)
 
 # Ensure necessary NLTK data files are available
-try:
-    nltk.data.find('tokenizers/punkt')
-except LookupError:
-    nltk.download('punkt', download_dir=nltk_data_path)
+required_nltk_resources = ['punkt', 'wordnet', 'omw-1.4', 'stopwords']
+for resource in required_nltk_resources:
+    try:
+        nltk.data.find(resource)
+    except LookupError:
+        nltk.download(resource, download_dir=nltk_data_path)
+        
+# Ensure necessary NLTK data files are available
+def ensure_nltk_resources():
+    try:
+        # Explicitly get the Punkt tokenizer
+        tokenizer = nltk.data.load("tokenizers/punkt/english.pickle")
+    except LookupError:
+        print("Downloading NLTK punkt tokenizer...")
+        nltk.download("punkt", download_dir=nltk_data_path)
+        tokenizer = nltk.data.load("tokenizers/punkt/english.pickle")
 
-try:
-    nltk.data.find('corpora/wordnet')
-except LookupError:
-    nltk.download('wordnet', download_dir=nltk_data_path)
+    try:
+        nltk.data.find("corpora/wordnet")
+    except LookupError:
+        nltk.download("wordnet", download_dir=nltk_data_path)
 
-try:
-    nltk.data.find('corpora/omw-1.4')
-except LookupError:
-    nltk.download('omw-1.4', download_dir=nltk_data_path)
+    try:
+        nltk.data.find("corpora/omw-1.4")
+    except LookupError:
+        nltk.download("omw-1.4", download_dir=nltk_data_path)
 
-try:
-    nltk.data.find('corpora/stopwords')
-except LookupError:
-    nltk.download('stopwords', download_dir=nltk_data_path)
+    try:
+        nltk.data.find("corpora/stopwords")
+    except LookupError:
+        nltk.download("stopwords", download_dir=nltk_data_path)
+
+# Call the function to ensure all resources are available
+ensure_nltk_resources()
 
 # Load intents from the JSON file (Make sure the Intent.json is in the same directory or adjust path)
 file_path = os.path.abspath("Intent.json")
+if not os.path.exists(file_path):
+    raise FileNotFoundError(f"Intent.json file not found at {file_path}")
+
 with open(file_path, "r") as file:
     intents = json.load(file)
 
 # Initialize lemmatizer for preprocessing
 lemmatizer = WordNetLemmatizer()
 
-# Preprocess text by lemmatizing
+# Preprocess text by tokenizing and lemmatizing
 def preprocess_text(text):
     words = word_tokenize(text.lower())
     return [lemmatizer.lemmatize(word) for word in words]
@@ -186,7 +205,7 @@ def main():
         st.header("Conversation History:")
         with open('chat_log.csv', 'r', encoding='utf-8') as csvfile:
             csv_reader = csv.reader(csvfile)
-            next(csv_reader)  # Skip the header row
+            next(csv_reader, None)  # Skip the header row
             history = list(csv_reader)[-5:]  # Show the last 5 conversations
             for row in history:
                 st.markdown(f"""
@@ -220,7 +239,7 @@ def main():
         st.header("Conversation History")
         with open('chat_log.csv', 'r', encoding='utf-8') as csvfile:
             csv_reader = csv.reader(csvfile)
-            next(csv_reader)  # Skip the header row
+            next(csv_reader, None)  # Skip the header row
             for row in csv_reader:
                 st.text(f"User: {row[0]}")
                 st.text(f"Chatbot: {row[1]}")
