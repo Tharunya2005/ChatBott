@@ -66,9 +66,6 @@ def chatbot(input_text):
 
     return "I'm still learning, please rephrase your question."
 
-# Add your remaining code (e.g., `main()` function and Streamlit UI) here.
-
-
 # Adding custom HTML and CSS for the sustainable food practices theme
 def add_custom_css():
     st.markdown("""
@@ -153,8 +150,12 @@ def add_custom_css():
     </style>
     """, unsafe_allow_html=True)
 
+# Initialize global counter variable
+counter = 0  # Initialize before usage
+
+# Main function
 def main():
-    global counter
+    global counter  # Declare that we're using the global counter variable
     add_custom_css()  # Apply custom CSS for the sustainable theme
 
     # Display BIOFEAST Header without logo
@@ -178,73 +179,5 @@ def main():
                 csv_writer = csv.writer(csvfile)
                 csv_writer.writerow(['User Input', 'Chatbot Response'])
 
-        counter += 1
-        
-        # Display conversation history at the top
-        st.header("Conversation History:")
-        with open('chat_log.csv', 'r', encoding='utf-8') as csvfile:
-            csv_reader = csv.reader(csvfile)
-            next(csv_reader)  # Skip the header row
-            history = list(csv_reader)[-5:]  # Show the last 5 conversations
-            for row in history:
-                st.markdown(f"""
-                <div class="history-item history-item-user">User: {row[0]}</div>
-                <div class="history-item history-item-chatbot">Chatbot: {row[1]}</div>
-                """, unsafe_allow_html=True)
-
-        # User input
-        user_input = st.text_input("You:", key=f"user_input_{counter}")
-
-        if user_input:
-            # Convert the user input to a string
-            user_input_str = str(user_input)
-
-            # Get chatbot response
-            response = chatbot(user_input)
-            st.text_area("Chatbot:", value=response, height=120, max_chars=None, key=f"chatbot_response_{counter}")
-
-            # Save the user input and chatbot response to the chat_log.csv file
-            with open('chat_log.csv', 'a', newline='', encoding='utf-8') as csvfile:
-                csv_writer = csv.writer(csvfile)
-                csv_writer.writerow([user_input_str, response])
-
-            if response.lower() in ['goodbye', 'bye']:
-                st.write("Thank you for chatting with me. Have a great day!")
-                st.stop()
-
-    # Conversation History Menu
-    elif choice == "Conversation History":
-        # Display the conversation history in a collapsible expander
-        st.header("Conversation History")
-        with open('chat_log.csv', 'r', encoding='utf-8') as csvfile:
-            csv_reader = csv.reader(csvfile)
-            next(csv_reader)  # Skip the header row
-            for row in csv_reader:
-                st.text(f"User: {row[0]}")
-                st.text(f"Chatbot: {row[1]}")
-                st.markdown("---")
-
-    # About Menu
-    elif choice == "About":
-        st.write("The goal of this project is to create a chatbot that can understand and respond to user input based on sustainable food practices.")
-
-        st.subheader("Project Overview:")
-
-        st.write("""
-        This chatbot is designed to help users understand and make informed decisions about sustainable food choices, reducing food waste, and supporting a healthier environment. The chatbot is trained using intents and machine learning techniques.
-        """)
-
-        st.subheader("How the Chatbot Works:")
-
-        st.write("""
-        The chatbot uses Natural Language Processing (NLP) techniques to process user input and match it to predefined intents. It then responds with relevant information related to sustainable food practices based on the user's query.
-        """)
-
-        st.subheader("Sustainable Food Practices:")
-
-        st.write("""
-        Sustainable food practices are methods of food production and consumption that have minimal environmental impact. This includes choosing locally sourced food, reducing food waste, supporting ethical farming practices, and eating more plant-based foods.
-        """)
-
-if __name__ == '__main__':
-    main()
+        # Increment the counter
+        counter += 1  # This now works because `counter` is initialized globally
