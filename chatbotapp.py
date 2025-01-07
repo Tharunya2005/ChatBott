@@ -5,6 +5,7 @@ import nltk
 import ssl
 import streamlit as st
 import csv
+import base64
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 
@@ -61,6 +62,13 @@ def chatbot(input_text):
 
 counter = 0
 
+# Load the image and encode it in base64
+def load_image_base64(image_path):
+    if not os.path.exists(image_path):
+        raise FileNotFoundError(f"Image file not found at {image_path}")
+    with open(image_path, "rb") as img_file:
+        return base64.b64encode(img_file.read()).decode("utf-8")
+
 # Adding custom HTML and CSS for the sustainable food practices theme
 def add_custom_css():
     st.markdown("""
@@ -74,6 +82,10 @@ def add_custom_css():
 
     h1, h2 {
         color: #2A7B35;
+    }
+
+    .menu {
+        background-color: #D8C4B6;
     }
 
     .stButton>button {
@@ -130,17 +142,33 @@ def add_custom_css():
     }
 
     .biofeast-header {
-        text-align: center;
-        background-color: #A9BFA8;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #123524;
+        color: white;
         padding: 20px;
-        color: Olivegreen;
-        font-size: 2.5em;
-        font-weight: bold;
+        border-radius: 8px;
+    }
+
+    .biofeast-header img {
+        max-width: 60px;
+        margin-right: 15px;
+    }
+
+    .biofeast-header h1 {
+        margin: 0;
+        font-size: 2em;
+        color: #FFFFFF;
+    }
+
+    .sidebar .sidebar-content {
+    background-color: #D8C4B6;  /* Brown Soil color */
     }
 
     /* Sidebar Menu Customization */
-    .sidebar .sidebar-content {
-        background-color: #D39D55;  /* Brown Soil color */
+    .css-1d391kg {  /* Sidebar content selector */
+        background-color: #D8C4B6 !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -149,8 +177,37 @@ def main():
     global counter
     add_custom_css()  # Apply custom CSS for the sustainable theme
 
-    # Display BIOFEAST Header without logo
-    st.markdown('<div class="biofeast-header">BIOFEAST Chatbot</div>', unsafe_allow_html=True)
+    # Load the logo image and encode it in base64
+    logo_base64 = load_image_base64("logo.png")
+
+    # Display header with embedded logo and background color
+    st.markdown(
+        f"""
+        <div class="biofeast-header">
+            <img src="data:image/png;base64,{logo_base64}">
+            <h1>BIOFEAST Chatbot</h1>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+def main():
+    global counter
+    add_custom_css()  # Apply custom CSS for the sustainable theme
+
+    # Load the logo image and encode it in base64
+    logo_base64 = load_image_base64("logo.png")
+
+    # Display header with embedded logo and background color
+    st.markdown(
+        f"""
+        <div class="biofeast-header">
+            <img src="data:image/png;base64,{logo_base64}">
+            <h1>BIOFEAST Chatbot</h1>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
     # Create a sidebar menu with options
     menu = ["Home", "Conversation History", "About"]
@@ -167,7 +224,7 @@ def main():
                 csv_writer.writerow(['User Input', 'Chatbot Response'])
 
         counter += 1
-        
+
         # Display conversation history at the top
         st.header("Conversation History:")
         with open('chat_log.csv', 'r', encoding='utf-8') as csvfile:
