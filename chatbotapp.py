@@ -66,6 +66,9 @@ def chatbot(input_text):
 
     return "I'm still learning, please rephrase your question."
 
+# Add your remaining code (e.g., `main()` function and Streamlit UI) here.
+
+
 # Adding custom HTML and CSS for the sustainable food practices theme
 def add_custom_css():
     st.markdown("""
@@ -150,10 +153,6 @@ def add_custom_css():
     </style>
     """, unsafe_allow_html=True)
 
-# Initialize global counter variable
-counter = 0
-
-# Main function
 def main():
     global counter
     add_custom_css()  # Apply custom CSS for the sustainable theme
