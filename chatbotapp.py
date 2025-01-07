@@ -14,7 +14,6 @@ ssl._create_default_https_context = ssl._create_unverified_context
 # Set NLTK data path explicitly to avoid lookup errors
 nltk_data_path = os.path.abspath("nltk_data")
 os.makedirs(nltk_data_path, exist_ok=True)  # Ensure the directory exists
-nltk.data.path.append(nltk_data_path)
 
 # Ensure necessary NLTK data files are available
 required_nltk_resources = ['punkt', 'wordnet', 'omw-1.4', 'stopwords']
