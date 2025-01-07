@@ -238,6 +238,7 @@ def main():
         st.write("""
         Sustainable food practices are methods of food production and consumption that have minimal environmental impact. This includes choosing locally sourced food, reducing food waste, supporting ethical farming practices, and eating more plant-based foods.
         """)
+        st.write(f"NLTK Data Path: {nltk.data.path}")
 
 if __name__ == '__main__':
     main()
