@@ -15,23 +15,27 @@ ssl._create_default_https_context = ssl._create_unverified_context
 nltk_data_path = os.path.abspath("nltk_data")
 nltk.data.path.append(nltk_data_path)
 
-# Function to ensure NLTK data is downloaded
-def ensure_nltk_data():
-    nltk_dependencies = [
-        ('tokenizers/punkt', 'punkt'),
-        ('corpora/wordnet', 'wordnet'),
-        ('corpora/omw-1.4', 'omw-1.4'),
-        ('corpora/stopwords', 'stopwords')
-    ]
+# Ensure necessary NLTK data files are available
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    nltk.download('punkt', download_dir=nltk_data_path)
 
-    for resource, name in nltk_dependencies:
-        try:
-            nltk.data.find(resource)
-        except LookupError:
-            nltk.download(name, download_dir=nltk_data_path)
+try:
+    nltk.data.find('corpora/wordnet')
+except LookupError:
+    nltk.download('wordnet', download_dir=nltk_data_path)
 
-# Ensure all necessary NLTK data is available
-ensure_nltk_data()
+# Download additional NLTK data files for better functionality
+try:
+    nltk.data.find('corpora/omw-1.4')
+except LookupError:
+    nltk.download('omw-1.4', download_dir=nltk_data_path)
+
+try:
+    nltk.data.find('corpora/stopwords')
+except LookupError:
+    nltk.download('stopwords', download_dir=nltk_data_path)
 
 # Load intents from the JSON file (Make sure the Intent.json is in the same directory or adjust path)
 file_path = os.path.abspath("Intent.json")    
@@ -65,6 +69,8 @@ def chatbot(input_text):
         return random.choice(best_match["responses"])
 
     return "I'm still learning, please rephrase your question."
+
+counter = 0
 
 # Adding custom HTML and CSS for the sustainable food practices theme
 def add_custom_css():
@@ -150,12 +156,8 @@ def add_custom_css():
     </style>
     """, unsafe_allow_html=True)
 
-# Initialize global counter variable
-counter = 0  # Initialize before usage
-
-# Main function
 def main():
-    global counter  # Declare that we're using the global counter variable
+    global counter
     add_custom_css()  # Apply custom CSS for the sustainable theme
 
     # Display BIOFEAST Header without logo
@@ -179,5 +181,73 @@ def main():
                 csv_writer = csv.writer(csvfile)
                 csv_writer.writerow(['User Input', 'Chatbot Response'])
 
-        # Increment the counter
-        counter += 1  # This now works because `counter` is initialized globally
+        counter += 1
+        
+        # Display conversation history at the top
+        st.header("Conversation History:")
+        with open('chat_log.csv', 'r', encoding='utf-8') as csvfile:
+            csv_reader = csv.reader(csvfile)
+            next(csv_reader)  # Skip the header row
+            history = list(csv_reader)[-5:]  # Show the last 5 conversations
+            for row in history:
+                st.markdown(f"""
+                <div class="history-item history-item-user">User: {row[0]}</div>
+                <div class="history-item history-item-chatbot">Chatbot: {row[1]}</div>
+                """, unsafe_allow_html=True)
+
+        # User input
+        user_input = st.text_input("You:", key=f"user_input_{counter}")
+
+        if user_input:
+            # Convert the user input to a string
+            user_input_str = str(user_input)
+
+            # Get chatbot response
+            response = chatbot(user_input)
+            st.text_area("Chatbot:", value=response, height=120, max_chars=None, key=f"chatbot_response_{counter}")
+
+            # Save the user input and chatbot response to the chat_log.csv file
+            with open('chat_log.csv', 'a', newline='', encoding='utf-8') as csvfile:
+                csv_writer = csv.writer(csvfile)
+                csv_writer.writerow([user_input_str, response])
+
+            if response.lower() in ['goodbye', 'bye']:
+                st.write("Thank you for chatting with me. Have a great day!")
+                st.stop()
+
+    # Conversation History Menu
+    elif choice == "Conversation History":
+        # Display the conversation history in a collapsible expander
+        st.header("Conversation History")
+        with open('chat_log.csv', 'r', encoding='utf-8') as csvfile:
+            csv_reader = csv.reader(csvfile)
+            next(csv_reader)  # Skip the header row
+            for row in csv_reader:
+                st.text(f"User: {row[0]}")
+                st.text(f"Chatbot: {row[1]}")
+                st.markdown("---")
+
+    # About Menu
+    elif choice == "About":
+        st.write("The goal of this project is to create a chatbot that can understand and respond to user input based on sustainable food practices.")
+
+        st.subheader("Project Overview:")
+
+        st.write("""
+        This chatbot is designed to help users understand and make informed decisions about sustainable food choices, reducing food waste, and supporting a healthier environment. The chatbot is trained using intents and machine learning techniques.
+        """)
+
+        st.subheader("How the Chatbot Works:")
+
+        st.write("""
+        The chatbot uses Natural Language Processing (NLP) techniques to process user input and match it to predefined intents. It then responds with relevant information related to sustainable food practices based on the user's query.
+        """)
+
+        st.subheader("Sustainable Food Practices:")
+
+        st.write("""
+        Sustainable food practices are methods of food production and consumption that have minimal environmental impact. This includes choosing locally sourced food, reducing food waste, supporting ethical farming practices, and eating more plant-based foods.
+        """)
+
+if __name__ == '__main__':
+    main()
