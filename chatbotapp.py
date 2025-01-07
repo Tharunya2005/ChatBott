@@ -150,11 +150,7 @@ def main():
     add_custom_css()  # Apply custom CSS for the sustainable theme
 
     # Display BIOFEAST Header without logo
-    st.markdown("""
-    <div class="biofeast-header">
-        BIOFEAST Chatbot
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown('<div class="biofeast-header">BIOFEAST Chatbot</div>', unsafe_allow_html=True)
 
     # Create a sidebar menu with options
     menu = ["Home", "Conversation History", "About"]
