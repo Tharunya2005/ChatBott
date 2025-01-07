@@ -15,27 +15,23 @@ ssl._create_default_https_context = ssl._create_unverified_context
 nltk_data_path = os.path.abspath("nltk_data")
 nltk.data.path.append(nltk_data_path)
 
-# Ensure necessary NLTK data files are available
-try:
-    nltk.data.find('tokenizers/punkt')
-except LookupError:
-    nltk.download('punkt', download_dir=nltk_data_path)
+# Function to ensure NLTK data is downloaded
+def ensure_nltk_data():
+    nltk_dependencies = [
+        ('tokenizers/punkt', 'punkt'),
+        ('corpora/wordnet', 'wordnet'),
+        ('corpora/omw-1.4', 'omw-1.4'),
+        ('corpora/stopwords', 'stopwords')
+    ]
 
-try:
-    nltk.data.find('corpora/wordnet')
-except LookupError:
-    nltk.download('wordnet', download_dir=nltk_data_path)
+    for resource, name in nltk_dependencies:
+        try:
+            nltk.data.find(resource)
+        except LookupError:
+            nltk.download(name, download_dir=nltk_data_path)
 
-# Download additional NLTK data files for better functionality
-try:
-    nltk.data.find('corpora/omw-1.4')
-except LookupError:
-    nltk.download('omw-1.4', download_dir=nltk_data_path)
-
-try:
-    nltk.data.find('corpora/stopwords')
-except LookupError:
-    nltk.download('stopwords', download_dir=nltk_data_path)
+# Ensure all necessary NLTK data is available
+ensure_nltk_data()
 
 # Load intents from the JSON file (Make sure the Intent.json is in the same directory or adjust path)
 file_path = os.path.abspath("Intent.json")    
@@ -69,8 +65,6 @@ def chatbot(input_text):
         return random.choice(best_match["responses"])
 
     return "I'm still learning, please rephrase your question."
-
-counter = 0
 
 # Adding custom HTML and CSS for the sustainable food practices theme
 def add_custom_css():
@@ -156,6 +150,10 @@ def add_custom_css():
     </style>
     """, unsafe_allow_html=True)
 
+# Initialize global counter variable
+counter = 0
+
+# Main function
 def main():
     global counter
     add_custom_css()  # Apply custom CSS for the sustainable theme
