@@ -23,34 +23,16 @@ for resource in required_nltk_resources:
         nltk.data.find(resource)
     except LookupError:
         nltk.download(resource, download_dir=nltk_data_path)
-        
-# Ensure necessary NLTK data files are available
-def ensure_nltk_resources():
+
+# Ensure Punkt tokenizer is explicitly available
+def ensure_punkt_tokenizer():
     try:
-        # Explicitly get the Punkt tokenizer
-        tokenizer = nltk.data.load("tokenizers/punkt/english.pickle")
+        nltk.tokenize._get_punkt_tokenizer("english")
     except LookupError:
-        print("Downloading NLTK punkt tokenizer...")
+        print("Downloading Punkt tokenizer...")
         nltk.download("punkt", download_dir=nltk_data_path)
-        tokenizer = nltk.data.load("tokenizers/punkt/english.pickle")
 
-    try:
-        nltk.data.find("corpora/wordnet")
-    except LookupError:
-        nltk.download("wordnet", download_dir=nltk_data_path)
-
-    try:
-        nltk.data.find("corpora/omw-1.4")
-    except LookupError:
-        nltk.download("omw-1.4", download_dir=nltk_data_path)
-
-    try:
-        nltk.data.find("corpora/stopwords")
-    except LookupError:
-        nltk.download("stopwords", download_dir=nltk_data_path)
-
-# Call the function to ensure all resources are available
-ensure_nltk_resources()
+ensure_punkt_tokenizer()
 
 # Load intents from the JSON file (Make sure the Intent.json is in the same directory or adjust path)
 file_path = os.path.abspath("Intent.json")
