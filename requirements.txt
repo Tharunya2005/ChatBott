@@ -86,6 +86,7 @@ prompt_toolkit==3.0.47
 protobuf==5.29.1
 psutil==6.0.0
 pure-eval==0.2.2
+punkt_tab
 pyarrow==18.1.0
 pycparser==2.22
 pydeck==0.9.1
