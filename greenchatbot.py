@@ -12,7 +12,7 @@ from nltk.stem import WordNetLemmatizer
 ssl._create_default_https_context = ssl._create_unverified_context
 
 # Set NLTK data path explicitly to avoid lookup errors
-nltk_data_path = r"C:\Tharunya_edunet\nltk_data"
+nltk_data_path = os.path.join(os.getcwd(), "nltk_data")
 os.makedirs(nltk_data_path, exist_ok=True)
 nltk.data.path.append(nltk_data_path)
 
@@ -25,7 +25,7 @@ for resource in required_nltk_resources:
         nltk.download(resource, download_dir=nltk_data_path)
 
 # Load intents from the JSON file (Make sure the Intent.json is in the same directory or adjust path)
-file_path = os.path.join(r"C:\Tharunya_edunet", "Intent.json")
+file_path = os.path.join(os.getcwd(), "Intent.json")
 if not os.path.exists(file_path):
     raise FileNotFoundError(f"Intent.json file not found at {file_path}")
 
@@ -38,7 +38,7 @@ lemmatizer = WordNetLemmatizer()
 # Preprocess text by tokenizing and lemmatizing
 def preprocess_text(text):
     words = word_tokenize(text.lower())
-    return [lemmatizer.lemmatize(word) for word in words]
+    return [lemmatizer.lemmatize(word) for word in words if word.isalnum()]
 
 # Function to get chatbot response
 def chatbot(input_text):
@@ -60,8 +60,6 @@ def chatbot(input_text):
 
     return "I'm still learning, please rephrase your question."
 
-counter = 0
-
 # Adding custom HTML and CSS for the sustainable food practices theme
 def add_custom_css():
     st.markdown("""
@@ -70,7 +68,6 @@ def add_custom_css():
         background-color: #E4F1DC;
         font-family: 'Arial', sans-serif;
         color: #3A6A40;
-        line-height: 1.6;
     }
 
     h1, h2 {
@@ -88,46 +85,6 @@ def add_custom_css():
 
     .stButton>button:hover {
         background-color: #7C9F47;
-        border-color: #7C9F47;
-    }
-
-    .stTextArea {
-        background-color: #FFFFFF;
-        border-radius: 8px;
-        border: 1px solid #A3C36B;
-    }
-
-    .stTextInput>div>input {
-        background-color: #F1F9E7;
-        color: #3A6A40;
-        border: 1px solid #A3C36B;
-        border-radius: 8px;
-        padding: 8px 12px;
-    }
-
-    .stTextInput>div>input:focus {
-        outline-color: #7C9F47;
-    }
-
-    .stMarkdown {
-        margin-top: 20px;
-    }
-
-    .history-item {
-        background-color: #F9F9F9;
-        padding: 12px;
-        border-radius: 8px;
-        margin-bottom: 8px;
-        border: 1px solid #A3C36B;
-    }
-
-    .history-item-user {
-        background-color: #86A788;
-    }
-
-    .history-item-chatbot {
-        background-color: #638C6D;
-        color: white;
     }
 
     .biofeast-header {
@@ -138,19 +95,14 @@ def add_custom_css():
         font-size: 2.5em;
         font-weight: bold;
     }
-
-    /* Sidebar Menu Customization */
-    .sidebar .sidebar-content {
-        background-color: #D39D55;  /* Brown Soil color */
-    }
     </style>
     """, unsafe_allow_html=True)
 
+# Main function for Streamlit app
 def main():
-    global counter
     add_custom_css()  # Apply custom CSS for the sustainable theme
 
-    # Display BIOFEAST Header without logo
+    # Display BIOFEAST Header
     st.markdown("""
     <div class="biofeast-header">
         BIOFEAST Chatbot
@@ -161,85 +113,45 @@ def main():
     menu = ["Home", "Conversation History", "About"]
     choice = st.sidebar.selectbox("Menu", menu)
 
+    chat_log_path = os.path.join(os.getcwd(), "chat_log.csv")
+
     # Home Menu
     if choice == "Home":
-        st.write("Welcome to the Sustainable Food Practices Chatbot. Please type a message and press Enter to start the conversation.")
+        st.write("Welcome to the Sustainable Food Practices Chatbot. Type a message to start!")
 
-        # Check if the chat_log.csv file exists, and if not, create it with column names
-        chat_log_path = os.path.join(r"C:\Tharunya_edunet", "chat_log.csv")
+        # Ensure chat log file exists
         if not os.path.exists(chat_log_path):
             with open(chat_log_path, 'w', newline='', encoding='utf-8') as csvfile:
                 csv_writer = csv.writer(csvfile)
                 csv_writer.writerow(['User Input', 'Chatbot Response'])
 
-        counter += 1
-        
-        # Display conversation history at the top
-        st.header("Conversation History:")
-        with open(chat_log_path, 'r', encoding='utf-8') as csvfile:
-            csv_reader = csv.reader(csvfile)
-            next(csv_reader, None)  # Skip the header row
-            history = list(csv_reader)[-5:]  # Show the last 5 conversations
-            for row in history:
-                st.markdown(f"""
-                <div class="history-item history-item-user">User: {row[0]}</div>
-                <div class="history-item-chatbot">Chatbot: {row[1]}</div>
-                """, unsafe_allow_html=True)
-
         # User input
-        user_input = st.text_input("You:", key=f"user_input_{counter}")
+        user_input = st.text_input("You:")
 
         if user_input:
-            # Convert the user input to a string
-            user_input_str = str(user_input)
-
             # Get chatbot response
             response = chatbot(user_input)
-            st.text_area("Chatbot:", value=response, height=120, max_chars=None, key=f"chatbot_response_{counter}")
+            st.markdown(f"**Chatbot:** {response}")
 
-            # Save the user input and chatbot response to the chat_log.csv file
+            # Save to chat log
             with open(chat_log_path, 'a', newline='', encoding='utf-8') as csvfile:
                 csv_writer = csv.writer(csvfile)
-                csv_writer.writerow([user_input_str, response])
-
-            if response.lower() in ['goodbye', 'bye']:
-                st.write("Thank you for chatting with me. Have a great day!")
-                st.stop()
+                csv_writer.writerow([user_input, response])
 
     # Conversation History Menu
     elif choice == "Conversation History":
-        # Display the conversation history in a collapsible expander
         st.header("Conversation History")
-        with open(chat_log_path, 'r', encoding='utf-8') as csvfile:
-            csv_reader = csv.reader(csvfile)
-            next(csv_reader, None)  # Skip the header row
-            for row in csv_reader:
-                st.text(f"User: {row[0]}")
-                st.text(f"Chatbot: {row[1]}")
-                st.markdown("---")
+        if os.path.exists(chat_log_path):
+            with open(chat_log_path, 'r', encoding='utf-8') as csvfile:
+                csv_reader = csv.reader(csvfile)
+                next(csv_reader, None)  # Skip the header row
+                for row in csv_reader:
+                    st.markdown(f"**User:** {row[0]}  \n**Chatbot:** {row[1]}  \n---")
 
     # About Menu
     elif choice == "About":
-        st.write("The goal of this project is to create a chatbot that can understand and respond to user input based on sustainable food practices.")
-
-        st.subheader("Project Overview:")
-
-        st.write("""
-        This chatbot is designed to help users understand and make informed decisions about sustainable food choices, reducing food waste, and supporting a healthier environment. The chatbot is trained using intents and machine learning techniques.
-        """)
-
-        st.subheader("How the Chatbot Works:")
-
-        st.write("""
-        The chatbot uses Natural Language Processing (NLP) techniques to process user input and match it to predefined intents. It then responds with relevant information related to sustainable food practices based on the user's query.
-        """)
-
-        st.subheader("Sustainable Food Practices:")
-
-        st.write("""
-        Sustainable food practices are methods of food production and consumption that have minimal environmental impact. This includes choosing locally sourced food, reducing food waste, supporting ethical farming practices, and eating more plant-based foods.
-        """)
-        st.write(f"NLTK Data Path: {nltk.data.path}")
+        st.write("This chatbot promotes sustainable food practices.")
+        st.write("It helps users make informed decisions about food choices and reducing waste.")
 
 if __name__ == '__main__':
     main()
